@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-connector-configmap
+data:
+  config.yaml: |
+    # Kafka configuration
+    kafka:
+      bootstrap_servers: {{ .Values.kafka.bootstrap_servers }}
+      port: {{ .Values.kafka.port }}
+      enable_auto_commit: {{ .Values.kafka.enable_auto_commit }}
+      auto_commit_interval_ms: {{ .Values.kafka.auto_commit_interval_ms }}
+      auto_offset_reset: {{ .Values.kafka.auto_offset_reset }}
+      group_id: {{ .Values.kafka.group_id }}
+      client_id: {{ .Values.kafka.client_id }}
+      poll_timeout_seconds: {{ .Values.kafka.poll_timeout_seconds }}
+      topics:
+      {{- range .Values.kafka.topics }}
+        - {{ . }}
+      {{- end }}
+
+    # Influx DB configuration
+    influxdb:
+      host: {{ .Values.influxdb.host }}
+      port: {{ .Values.influxdb.port }}
+      database: {{ .Values.influxdb.database }}
+
+    # Logging configuration
+    logging:
+      level: {{ .Values.logging.level }}
