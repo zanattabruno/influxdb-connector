@@ -6,8 +6,6 @@ import json
 from influxdb import InfluxDBClient
 
 
-# Your code here
-
 def load_config():
     """
     Load configuration from a YAML file.
@@ -26,6 +24,15 @@ logging.basicConfig(level=level, format='%(asctime)s - %(name)s - %(levelname)s 
 logger = logging.getLogger(__name__)
 
 def flatten_json(y):
+    """
+    Flattens a nested JSON object into a flat dictionary with keys as the path to the value.
+
+    Args:
+        y (dict): The JSON object to flatten.
+
+    Returns:
+        dict: A flat dictionary with keys as the path to the value.
+    """
     out = {}
 
     def flatten(x, name=''):
@@ -55,6 +62,15 @@ def adjust_quotes(data):
         return data
 
 def save_event_in_db(event):
+    """
+    Saves an event in the InfluxDB database.
+
+    Args:
+        event (dict): The event to be saved in the database.
+
+    Returns:
+        None
+    """
     client = InfluxDBClient(host=config['influxdb']['host'], port=config['influxdb']['port'], database=config['influxdb']['database'])
     client.create_database(config['influxdb']['database'])  # Can be removed if your database is already created
     flattened_event = flatten_json(event)
@@ -78,6 +94,17 @@ def save_event_in_db(event):
 
 
 def get_kafka_config():
+    """
+    Returns a dictionary containing the Kafka configuration parameters required to connect to a Kafka cluster.
+    
+    Returns:
+    dict: A dictionary containing the following Kafka configuration parameters:
+        - bootstrap.servers: The Kafka bootstrap servers to connect to.
+        - group.id: The Kafka consumer group ID to use.
+        - client.id: The Kafka client ID to use.
+        - enable.auto.commit: Whether or not to enable automatic offset commit.
+        - auto.offset.reset: The strategy to use for resetting offsets when there is no initial offset in Kafka or if the current offset does not exist on the server.
+    """
     return {
         'bootstrap.servers': f"{config['kafka']['bootstrap_servers']}:{config['kafka']['port']}",
         'group.id': config['kafka']['group_id'],
@@ -103,7 +130,7 @@ if __name__ == "__main__":
                 if msg.value() is None:
                     logger.warning("Received invalid message with None value.")
                     continue
-                logger.debug(f'Received message from topic {msg.topic()} at offset {msg.offset()}')
+                logger.info(f'Received message from topic {msg.topic()} at offset {msg.offset()}')
                 try:
                     msg_value = adjust_quotes(json.loads(msg.value().decode('utf-8')))
                     save_event_in_db(msg_value)
