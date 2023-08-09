@@ -1,6 +1,8 @@
 # InfluxDB Connector for Kafka
 The InfluxDB Connector consumes messages from specified Kafka topics and saves them to InfluxDB after processing and flattening the nested JSON objects. This connector utilizes the confluent-kafka library for Kafka consumption and the InfluxDB client library for database operations.
 
+![Basic InfluxDB Connector Architecture](images/VES-O1.png "Basic InfluxDB Connector Architecture")
+
 ## Features
 
 - Configurable Kafka consumer that can subscribe to multiple topics.
