@@ -24,7 +24,7 @@ influxdb:
 
 # Logging configuration
 logging:
-  level: DEBUG
+  level: INFO
 
 # Replica count
 replicaCount: 1
