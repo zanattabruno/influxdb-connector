@@ -5,6 +5,8 @@ import logging
 import json
 from influxdb import InfluxDBClient
 
+# Global variable to keep track of whether the database has been created or not
+db_created = False
 
 def load_config():
     """
@@ -71,8 +73,15 @@ def save_event_in_db(event):
     Returns:
         None
     """
+    global db_created
     client = InfluxDBClient(host=config['influxdb']['host'], port=config['influxdb']['port'], database=config['influxdb']['database'])
-    client.create_database(config['influxdb']['database'])  # Can be removed if your database is already created
+    
+    # Only create the database if it hasn't been created before
+    if not db_created:
+        client.create_database(config['influxdb']['database'])
+        db_created = True
+        logger.info(f"Database {config['influxdb']['database']} created")
+
     flattened_event = flatten_json(event)
     tags = {
         "domain": event["event"]["commonEventHeader"]["domain"],
@@ -80,8 +89,6 @@ def save_event_in_db(event):
         "source": event["event"]["commonEventHeader"]["sourceName"],
         # Add any other tags you consider vital for your use case
     }
-    if "measurementsForVfScalingFields" in event["event"] and "additionalObjects" in event["event"]["measurementsForVfScalingFields"] and len(event["event"]["measurementsForVfScalingFields"]["additionalObjects"]) > 0 and "objectName" in event["event"]["measurementsForVfScalingFields"]["additionalObjects"][0]:
-        tags["objectName"] = event["event"]["measurementsForVfScalingFields"]["additionalObjects"][0]["objectName"]
     json_body = [{
         "measurement": event["event"]["commonEventHeader"]["domain"],
         "tags": tags,
@@ -91,6 +98,7 @@ def save_event_in_db(event):
     logger.debug(f"Saving event in database: {json_body}")
     client.write_points(json_body)
     client.close()
+
 
 
 def get_kafka_config():
