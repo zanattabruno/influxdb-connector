@@ -93,9 +93,10 @@ def save_event_in_db(event, topic_name):
     json_body = [{
         "measurement": topic_name,
         "tags": tags,
-        "time": event["event"]["commonEventHeader"]["lastEpochMicrosec"],
+        "time": event["event"]["commonEventHeader"]["lastEpochMicrosec"] * 1000,
         "fields": flattened_event
     }]
+    logger.info(f"Saving event in database, measurement: {topic_name}, time: {event['event']['commonEventHeader']['lastEpochMicrosec'] * 1000}.")
     logger.debug(f"Saving event in database: {json_body}")
     client.write_points(json_body)
     client.close()
