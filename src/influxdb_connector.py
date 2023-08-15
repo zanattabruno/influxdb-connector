@@ -88,11 +88,10 @@ def save_event_in_db(event, topic_name):
         "domain": event["event"]["commonEventHeader"]["domain"],
         "eventName": event["event"]["commonEventHeader"]["eventName"],
         "source": event["event"]["commonEventHeader"]["sourceName"],
-        "topic": topic_name,  # Add the topic name here
         # Add any other tags you consider vital for your use case
     }
     json_body = [{
-        "measurement": event["event"]["commonEventHeader"]["domain"],
+        "measurement": topic_name,
         "tags": tags,
         "time": event["event"]["commonEventHeader"]["lastEpochMicrosec"],
         "fields": flattened_event
