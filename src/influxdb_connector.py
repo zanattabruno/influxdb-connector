@@ -63,12 +63,13 @@ def adjust_quotes(data):
     else:
         return data
 
-def save_event_in_db(event):
+def save_event_in_db(event, topic_name):
     """
     Saves an event in the InfluxDB database.
 
     Args:
         event (dict): The event to be saved in the database.
+        topic_name (str): The name of the Kafka topic from which the event was consumed.
 
     Returns:
         None
@@ -87,6 +88,7 @@ def save_event_in_db(event):
         "domain": event["event"]["commonEventHeader"]["domain"],
         "eventName": event["event"]["commonEventHeader"]["eventName"],
         "source": event["event"]["commonEventHeader"]["sourceName"],
+        "topic": topic_name,  # Add the topic name here
         # Add any other tags you consider vital for your use case
     }
     json_body = [{
@@ -141,7 +143,7 @@ if __name__ == "__main__":
                 logger.info(f'Received message from topic {msg.topic()} at offset {msg.offset()}')
                 try:
                     msg_value = adjust_quotes(json.loads(msg.value().decode('utf-8')))
-                    save_event_in_db(msg_value)
+                    save_event_in_db(msg_value, msg.topic())
                 except json.JSONDecodeError:
                     logger.error(f"Failed to decode message: {msg.value().decode('utf-8')}")
             elif msg.error().code() == KafkaError._PARTITION_EOF:

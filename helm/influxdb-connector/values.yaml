@@ -13,8 +13,8 @@ kafka:
   client_id: "influxdb-connector"
   poll_timeout_seconds: 1
   topics:
-    - heartbeat
-    - measurementsforvfscaling
+    - e2nodes
+    - k8snodesresources
 
 # InfluxDB configuration
 influxdb:
