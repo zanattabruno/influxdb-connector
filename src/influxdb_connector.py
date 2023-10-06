@@ -50,6 +50,12 @@ def flatten_json(y):
             out[name[:-1]] = x
 
     flatten(y)
+    
+    # Convert fields containing "e2node_control_loop_latency_seconds" to float.
+    for field in out:
+        if "e2node_control_loop_latency_seconds" in field:
+            out[field] = float(out[field])
+
     return out
 
 def adjust_quotes(data):
