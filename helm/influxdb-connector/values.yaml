@@ -15,6 +15,7 @@ kafka:
   topics:
     - e2nodes
     - k8snodesresources
+    - ues
 
 # InfluxDB configuration
 influxdb:
